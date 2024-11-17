@@ -155,39 +155,22 @@ public class AVL<T extends Comparable<T>> extends BST<T> {
     }
 
     private List<Node<T>> filtrar(Node<T> node, long chaveMin, long chaveMax) {
-        List<Node<T>> resultados = new ArrayList<>();
-        if (node == null)
-            return resultados;
-
-        long chaveNode = gerarChaveNumerica(node.getData());
-
-        if (chaveMin <= chaveNode && chaveNode <= chaveMax)
-            resultados.add(node);
-
-        if (chaveMin < chaveNode)
-            resultados.addAll(filtrar(node.getEsq(), chaveMin, chaveMax));
-
-        if (chaveNode < chaveMax)
-            resultados.addAll(filtrar(node.getDir(), chaveMin, chaveMax));
-
+      List<Node<T>> resultados = new ArrayList<>();
+      if (node == null)
         return resultados;
-    }
 
-    private long gerarChaveNumerica(T data) {
-        // Assumindo que T é um Registro ou tem um método para obter os componentes necessários
-        if (data instanceof Registro) {
-            Registro registro = (Registro) data;
-            int ano = registro.getDiaSinistro();
-            int mes = registro.getMesSinistro();
-            int dia = registro.getDiaSinistro();
-            int hora = registro.getHoraSinistro();
-            int tipoVeiculo = registro.getTipoVeiculoEnvolvido();
-            int tipoSinistro = registro.getTipoSinistro();
+      Registro registro = (Registro) node.getData();
+      long chaveNode = registro.getChave();
 
-            return (long) (ano * Math.pow(10, 10) + mes * Math.pow(10, 8) + dia * Math.pow(10, 6) + 
-                           hora * Math.pow(10, 4) + tipoVeiculo * Math.pow(10, 2) + tipoSinistro);
-        } else {
-            throw new IllegalArgumentException("O tipo de dado não é suportado para geração de chave numérica");
-        }
+      if (chaveMin <= chaveNode && chaveNode <= chaveMax)
+        resultados.add(node);
+
+      if (chaveMin < chaveNode)
+        resultados.addAll(filtrar(node.getEsq(), chaveMin, chaveMax));
+
+      if (chaveNode < chaveMax)
+        resultados.addAll(filtrar(node.getDir(), chaveMin, chaveMax));
+
+      return resultados;
     }
 }
