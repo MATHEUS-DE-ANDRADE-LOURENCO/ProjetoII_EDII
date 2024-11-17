@@ -1,131 +1,105 @@
-public class Node {
-    protected String data;
-	protected Node pai;
-	protected Node esq;
-	protected Node dir;
+public class Node<T> {
+    protected T data;
+    protected Node<T> pai;
+    protected Node<T> esq;
+    protected Node<T> dir;
+    protected int altura;
 
-	public Node() {
-		this("", null);
-	}
+    public Node(T data) {
+        this(data, null);
+    }
 
-	public Node(String data) {
-		this(data, null);
-	}
+    public Node(T data, Node<T> pai) {
+        this.data = data;
+        this.pai = pai;
+        this.esq = null;
+        this.dir = null;
+        this.altura = 1;
+    }
 
-	public Node(String data, Node pai) {
-		this.data = data;
-		this.pai = pai;
-		this.esq = null;
-		this.dir = null;
-	}
+    public T getData() {
+        return data;
+    }
 
-	public String getData() {
-		return data;
-	}
+    public void setData(T data) {
+        this.data = data;
+    }
 
-	public void setData(String data) {
-		this.data = data;
-	}
+    public Node<T> getPai() {
+        return pai;
+    }
 
-	public Node getPai() {
-		return pai;
-	}
+    public void setPai(Node<T> pai) {
+        this.pai = pai;
+    }
 
-	public void setPai(Node pai) {
-		this.pai = pai;
-	}
+    public Node<T> getEsq() {
+        return esq;
+    }
 
-	public Node getEsq() {
-		return esq;
-	}
+    public void setEsq(Node<T> esq) {
+        this.esq = esq;
+        if (this.esq != null) {
+            this.esq.setPai(this);
+        }
+    }
 
-	public void setEsq(Node Esq) {
-		this.esq = Esq;
-		
-		if (this.esq != null) {
-			this.esq.setPai(this);
-		}
-	}
+    public Node<T> getDir() {
+        return dir;
+    }
 
-	public Node getDir() {
-		return dir;
-	}
+    public void setDir(Node<T> dir) {
+        this.dir = dir;
+        if (this.dir != null) {
+            this.dir.setPai(this);
+        }
+    }
 
-	public void setDir(Node dir) {
-		this.dir = dir;
-		
-		if (this.dir != null) {
-			this.dir.setPai(this);
-		}
-	}
+    public int getAltura() {
+        return altura;
+    }
 
-	public boolean temFilhoEsquerda() {
-		return esq != null;
-	}
+    public void setAltura(int altura) {
+        this.altura = altura;
+    }
 
-	public boolean temFilhoDireita() {
-		return dir != null;
-	}
+    public boolean temFilhoEsquerda() {
+        return esq != null;
+    }
 
-	public boolean ehRaiz() {
-		return pai == null;
-	}
+    public boolean temFilhoDireita() {
+        return dir != null;
+    }
 
-	public boolean ehFolha() {
-		return esq == null && dir == null;
-	}
+    public boolean ehRaiz() {
+        return pai == null;
+    }
 
-	public int getGrau() {
-		int grau = 0;
-		
-		if (temFilhoEsquerda()) {
-			++grau;
-		}
-		
-		if (temFilhoDireita()) {
-			++grau;
-		}
-		
-		return grau;
-	}
+    public boolean ehFolha() {
+        return esq == null && dir == null;
+    }
 
-	public int getLevel() {
-		if (ehRaiz()) {
-			return 0;
-		}
+    public int getGrau() {
+        int grau = 0;
+        if (temFilhoEsquerda()) ++grau;
+        if (temFilhoDireita()) ++grau;
+        return grau;
+    }
 
-		return pai.getLevel() + 1;
-	}
+    public int getLevel() {
+        if (ehRaiz()) return 0;
+        return pai.getLevel() + 1;
+    }
 
-	public int getAltura() {
-		if (ehFolha()) {
-			return 0;
-		}
+    public int calcularAltura() {
+        if (ehFolha()) return 0;
+        int altura = 0;
+        if (temFilhoEsquerda()) altura = Math.max(altura, esq.calcularAltura());
+        if (temFilhoDireita()) altura = Math.max(altura, dir.calcularAltura());
+        return altura + 1;
+    }
 
-		int altura = 0;
-		
-		if (temFilhoEsquerda()) {
-			altura = Math.max(altura, esq.getAltura());
-		}
-		
-		if (temFilhoDireita()) {
-			altura = Math.max(altura, dir.getAltura());
-		}
-		
-		return altura + 1;
-	}
-
-	@Override
-	public String toString() {
-		return "data: " + data
-				+ ", pai: " + (pai != null ? pai.getData() : "null")
-				+ ", Esq: " + (esq != null ? esq.getData() : "null")
-				+ ", Dir: " + (dir != null ? dir.getData() : "null")
-				+ ", ehRaiz(): " + ehRaiz()
-				+ ", ehFolha(): " + ehFolha()
-				+ ", getGrau(): " + getGrau()
-				+ ", getLevel(): " + getLevel()
-				+ ", getAltura(): " + getAltura();
-	}
-
+    public void atualizarAltura() {
+        this.altura = calcularAltura() + 1;
+    }
 }
