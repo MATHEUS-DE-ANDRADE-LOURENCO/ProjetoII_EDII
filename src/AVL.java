@@ -1,7 +1,12 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class AVL<T extends Comparable<T>> extends BST<T> {
+import Analisador.AnalisadorEstatistico;
+import Filtragem.Filtravel;
+import Filtragem.Filtro;
+
+public class AVL<T extends Comparable<T> & Filtravel> extends BST<T> {
     public AVL() {
         super();
     }
@@ -142,35 +147,27 @@ public class AVL<T extends Comparable<T>> extends BST<T> {
         return node;
     }
 
-    public List<Node<T>> filtrarPorAno(int ano) {
-        long chaveMin = (long) (ano * Math.pow(10, 10));
-        long chaveMax = (long) ((ano + 1) * Math.pow(10, 10) - 1);
-        return filtrar(raiz, chaveMin, chaveMax);
-    }
-
-    public List<Node<T>> filtrarPorAnoEMes(int ano, int mes) {
-        long chaveMin = (long) (ano * Math.pow(10, 10) + mes * Math.pow(10, 8));
-        long chaveMax = (long) (ano * Math.pow(10, 10) + (mes + 1) * Math.pow(10, 8) - 1);
-        return filtrar(raiz, chaveMin, chaveMax);
-    }
-
-    private List<Node<T>> filtrar(Node<T> node, long chaveMin, long chaveMax) {
+    public List<Node<T>> filtrar(Filtro<T> filtro) {
       List<Node<T>> resultados = new ArrayList<>();
-      if (node == null)
-        return resultados;
-
-      Registro registro = (Registro) node.getData();
-      long chaveNode = registro.getChave();
-
-      if (chaveMin <= chaveNode && chaveNode <= chaveMax)
-        resultados.add(node);
-
-      if (chaveMin < chaveNode)
-        resultados.addAll(filtrar(node.getEsq(), chaveMin, chaveMax));
-
-      if (chaveNode < chaveMax)
-        resultados.addAll(filtrar(node.getDir(), chaveMin, chaveMax));
-
+      filtrarRecursivo(raiz, filtro, resultados);
       return resultados;
+    }
+
+    private void filtrarRecursivo(Node<T> node, Filtro<T> filtro, List<Node<T>> resultados) {
+      if (node == null)
+        return;
+
+      if (filtro.aceita(node.getData())) {
+        resultados.add(node);
+      }
+
+      filtrarRecursivo(node.getEsq(), filtro, resultados);
+      filtrarRecursivo(node.getDir(), filtro, resultados);
+    }
+
+    public <R> R analisar(Filtro<T> filtro, AnalisadorEstatistico<T, R> analisador) {
+      List<Node<T>> dadosFiltrados = filtrar(filtro);
+      List<T> dados = dadosFiltrados.stream().map(Node::getData).collect(Collectors.toList());
+      return analisador.calcular(dados);
     }
 }

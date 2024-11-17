@@ -1,6 +1,9 @@
+package Modelo;
 import java.util.Map;
 
-public class Registro implements Comparable<Registro> {
+import Filtragem.Filtravel;
+
+public class Registro implements Filtravel, Comparable<Registro> {
     private long chave;
     private int anoSinistro;
     private int mesSinistro;
@@ -65,7 +68,6 @@ public class Registro implements Comparable<Registro> {
         return Long.compare(this.chave, outro.chave);
     }
 
-    // Getters and Setters
     public long getChave() {
         return chave;
     }

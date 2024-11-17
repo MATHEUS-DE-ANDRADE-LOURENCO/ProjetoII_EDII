@@ -2,6 +2,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import Analises.DistribuicaoTemporalAnalisador;
+import Filtragem.Filtro;
+import Filtros.FiltroPorAno;
+import Modelo.Registro;
+
 public class Main {
   public static void main(String[] args) {
     AVL<Registro> arvore = new AVL<Registro>();
@@ -96,11 +101,27 @@ public class Main {
     Registro registro3 = new Registro(dadosRegistro3);
     arvore.insert(registro3);
 
-    // Exemplo de filtragem
-    List<Node<Registro>> registros2016 = arvore.filtrarPorAno(2016);
-    for (Node<Registro> node : registros2016) {
-      Registro r = node.getData();
-      System.out.println("Registro de 2016: " + r.getTipoVeiculoEnvolvido());
-    }
+    // Distribuição temporal
+    Map<Integer, Long> distribuicaoTemporal = arvore.analisar(new FiltroPorAno(2023),
+        new DistribuicaoTemporalAnalisador());
+
+    // Análise geográfica
+    Map<String, Long> analiseGeografica = arvore.analisar(new FiltroPorAno(2023), new AnaliseGeograficaAnalisador());
+
+    // Tipos de veículos
+    Map<String, Long> tiposVeiculos = arvore.analisar(new FiltroPorAno(2023), new TiposVeiculosAnalisador());
+
+    // Gravidade dos sinistros
+    Map<String, Long> gravidadeSinistros = arvore.analisar(new FiltroPorAno(2023), new GravidadeSinistrosAnalisador());
+
+    // Análise de tipos de vias
+    Map<String, Long> analiseTiposVias = arvore.analisar(new FiltroPorAno(2023), new AnaliseTiposViasAnalisador());
+
+    // Análise temporal comparativa
+    Map<Integer, Long> analiseTemporalComparativa = arvore.analisar(new FiltroPorAno(2023),
+        new AnaliseTemporalComparativaAnalisador());
+
+    // Hotspots
+    List<String> hotspots = arvore.analisar(new FiltroPorAno(2023), new HotspotsAnalisador());
   }
 }
