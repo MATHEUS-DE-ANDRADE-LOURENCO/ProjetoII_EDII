@@ -6,6 +6,8 @@ import Filtragem.Filtravel;
 
 public class Registro implements Filtravel, Comparable<Registro> {
     private long chave;
+    private int idDelegacia;
+    private int numeroBo;
     private int anoSinistro;
     private int mesSinistro;
     private int diaSinistro;
@@ -21,10 +23,13 @@ public class Registro implements Filtravel, Comparable<Registro> {
     private int quantidadeVitimasFatais;
 
     public Registro(Map<String, String> dados) {
-      this.anoSinistro = Integer.parseInt(dados.get(limparTexto("Ano do Sinistro")));
-      this.mesSinistro = Integer.parseInt(dados.get(limparTexto("Mês do Sinistro")));
-      this.diaSinistro = Integer.parseInt(dados.get(limparTexto("Data do Sinistro")).split("/")[0]);
-      this.horaSinistro = Integer.parseInt(dados.get(limparTexto("Hora do Sinistro")));
+      System.out.println(dados.get("Ano do Sinistro"));
+      this.idDelegacia = Integer.parseInt(dados.get("Id da Delegacia"));
+      this.numeroBo = Integer.parseInt(dados.get("Número do Bo"));
+      this.anoSinistro = Integer.parseInt(dados.get("Ano do Sinistro"));
+      this.mesSinistro = Integer.parseInt(dados.get("Mês do Sinistro"));
+      this.diaSinistro = Integer.parseInt(dados.get("Data do Sinistro").split("/")[0]);
+      this.horaSinistro = Integer.parseInt(dados.get("Hora do Sinistro"));
       this.diaSemana = limparTexto(dados.get(limparTexto("Dia da Semana")));
       this.turno = limparTexto(dados.get(limparTexto("Turno")));
       this.regiaoAdministrativa = limparTexto(dados.get(limparTexto("Região Administrativa")));
@@ -33,15 +38,33 @@ public class Registro implements Filtravel, Comparable<Registro> {
       this.tipoVeiculoEnvolvido = determinarTipoVeiculo(dados);
       this.tipoSinistro = determinarTipoSinistro(dados);
       this.municipio = limparTexto(dados.get(limparTexto("Município")));
-      this.quantidadeVitimasFatais = Integer.parseInt(dados.get(limparTexto("Quantidade de vítimas fatais")));
+      this.quantidadeVitimasFatais = Integer.parseInt(dados.get("Quantidade de vítimas fatais"));
 
       // Gerar a chave numérica no construtor
       this.chave = gerarChaveNumerica();
     }
 
     private long gerarChaveNumerica() {
-      return (long) (anoSinistro * Math.pow(10, 10) + mesSinistro * Math.pow(10, 8) + diaSinistro * Math.pow(10, 6) +
-          horaSinistro * Math.pow(10, 4) + tipoVeiculoEnvolvido * Math.pow(10, 2) + tipoSinistro);
+      long chave = anoSinistro * 100000000000000L +
+          mesSinistro * 1000000000000L +
+          diaSinistro * 10000000000L +
+          horaSinistro * 100000000L +
+          tipoVeiculoEnvolvido * 1000000L +
+          tipoSinistro * 10000L +
+          quantidadeVitimasFatais * 100L;
+
+      // Adicionar ID da delegacia e número do B.O.
+      long idDelegaciaHash = idDelegacia % 10000; // Limita a 4 dígitos
+      long numeroBoHash = numeroBo % 10000; // Limita a 4 dígitos
+      chave += idDelegaciaHash * 1000000L + numeroBoHash * 100L;
+
+      // Adicionar um valor baseado no hash do município e região administrativa
+      int hashAdicional = (municipio + regiaoAdministrativa).hashCode();
+      hashAdicional = Math.abs(hashAdicional) % 100; // Garantir que seja positivo e entre 0-99
+
+      chave += hashAdicional;
+
+      return chave;
     }
 
     private String limparTexto(String texto) {
