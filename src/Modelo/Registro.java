@@ -1,4 +1,5 @@
 package Modelo;
+import java.text.Normalizer;
 import java.util.Map;
 
 import Filtragem.Filtravel;
@@ -11,6 +12,7 @@ public class Registro implements Filtravel, Comparable<Registro> {
     private int horaSinistro;
     private String diaSemana;
     private String turno;
+    private String municipio;
     private String regiaoAdministrativa;
     private String tipoVia;
     private String tipoLocal;
@@ -19,18 +21,19 @@ public class Registro implements Filtravel, Comparable<Registro> {
     private int quantidadeVitimasFatais;
 
     public Registro(Map<String, String> dados) {
-      this.anoSinistro = Integer.parseInt(dados.get("Ano do Sinistro"));
-      this.mesSinistro = Integer.parseInt(dados.get("Mês do Sinistro"));
-      this.diaSinistro = Integer.parseInt(dados.get("Data do Sinistro").split("/")[0]);
-      this.horaSinistro = Integer.parseInt(dados.get("Hora do Sinistro"));
-      this.diaSemana = dados.get("Dia da Semana");
-      this.turno = dados.get("Turno");
-      this.regiaoAdministrativa = dados.get("Região Administrativa");
-      this.tipoVia = dados.get("Tipo de via");
-      this.tipoLocal = dados.get("Tipo de local do sinistro");
+      this.anoSinistro = Integer.parseInt(dados.get(limparTexto("Ano do Sinistro")));
+      this.mesSinistro = Integer.parseInt(dados.get(limparTexto("Mês do Sinistro")));
+      this.diaSinistro = Integer.parseInt(dados.get(limparTexto("Data do Sinistro")).split("/")[0]);
+      this.horaSinistro = Integer.parseInt(dados.get(limparTexto("Hora do Sinistro")));
+      this.diaSemana = limparTexto(dados.get(limparTexto("Dia da Semana")));
+      this.turno = limparTexto(dados.get(limparTexto("Turno")));
+      this.regiaoAdministrativa = limparTexto(dados.get(limparTexto("Região Administrativa")));
+      this.tipoVia = limparTexto(dados.get(limparTexto("Tipo de via")));
+      this.tipoLocal = limparTexto(dados.get(limparTexto("Tipo de local do sinistro")));
       this.tipoVeiculoEnvolvido = determinarTipoVeiculo(dados);
       this.tipoSinistro = determinarTipoSinistro(dados);
-      this.quantidadeVitimasFatais = Integer.parseInt(dados.get("Quantidade de vítimas fatais"));
+      this.municipio = limparTexto(dados.get(limparTexto("Município")));
+      this.quantidadeVitimasFatais = Integer.parseInt(dados.get(limparTexto("Quantidade de vítimas fatais")));
 
       // Gerar a chave numérica no construtor
       this.chave = gerarChaveNumerica();
@@ -41,26 +44,40 @@ public class Registro implements Filtravel, Comparable<Registro> {
           horaSinistro * Math.pow(10, 4) + tipoVeiculoEnvolvido * Math.pow(10, 2) + tipoSinistro);
     }
 
-    private int determinarTipoVeiculo(Map<String, String> dados) {
-        String[] tipos = { "Pedestre", "Automóvel", "Bicicleta", "Caminhão", "Motocicleta", "Ônibus" };
-        for (int i = 0; i < tipos.length; i++) {
-            if ("1".equals(dados.get(tipos[i] + " envolvido")) || "1".equals(dados.get(tipos[i] + " envolvida"))) {
-                return i;
-            }
+    private String limparTexto(String texto) {
+        if (texto == null) {
+            return "";
         }
-        return 6; // Outro
+        // Remove acentos
+        String semAcentos = Normalizer.normalize(texto, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        // Converte para minúsculas e remove espaços extras
+        return semAcentos.toLowerCase().trim();
+    }
+
+    private int determinarTipoVeiculo(Map<String, String> dados) {
+      String[] tipos = { "pedestre", "automovel", "bicicleta", "caminhao", "motocicleta", "onibus" };
+      for (int i = 0; i < tipos.length; i++) {
+        String chave = limparTexto(tipos[i] + " envolvido");
+        String chaveAlternativa = limparTexto(tipos[i] + " envolvida");
+        if ("1".equals(dados.get(chave)) || "1".equals(dados.get(chaveAlternativa))) {
+          return i;
+        }
+      }
+      return 6; // Outro
     }
 
     private int determinarTipoSinistro(Map<String, String> dados) {
-        String[] tipos = { "Atropelamento", "Capotamento", "Choque", "Colisão frontal",
-                "Colisão lateral", "Colisão transversal", "Colisão traseira",
-                "Engavetamento", "Tombamento" };
-        for (int i = 0; i < tipos.length; i++) {
-            if ("1".equals(dados.get(tipos[i]))) {
-                return i;
-            }
+      String[] tipos = { "atropelamento", "capotamento", "choque", "colisao frontal",
+          "colisao lateral", "colisao transversal", "colisao traseira",
+          "engavetamento", "tombamento" };
+      for (int i = 0; i < tipos.length; i++) {
+        String chave = limparTexto(tipos[i]);
+        if ("1".equals(dados.get(chave))) {
+          return i;
         }
-        return 9; // Outro
+      }
+      return 9; // Outro
     }
 
     @Override
@@ -170,5 +187,13 @@ public class Registro implements Filtravel, Comparable<Registro> {
 
     public void setQuantidadeVitimasFatais(int quantidadeVitimasFatais) {
         this.quantidadeVitimasFatais = quantidadeVitimasFatais;
+    }
+    
+    public String getMunicipio() {
+      return municipio;
+    }
+
+    public void setMunicipio(String municipio) {
+      this.municipio = municipio;
     }
 }
