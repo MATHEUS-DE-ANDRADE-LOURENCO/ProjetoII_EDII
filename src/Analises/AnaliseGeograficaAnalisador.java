@@ -11,6 +11,6 @@ public class AnaliseGeograficaAnalisador implements AnalisadorEstatistico<Regist
   @Override
   public Map<String, Long> calcular(List<Registro> dados) {
     return dados.stream()
-        .collect(Collectors.groupingBy(Registro::getMunicipio, Collectors.counting()));
+        .collect(Collectors.groupingBy(r -> r.getMunicipio(), Collectors.counting()));
   }
 }

@@ -121,6 +121,21 @@ public class BST<T extends Comparable<T> & Filtravel> {
     return null;
   }
 
+  public int getHeight() {
+    return getHeight(raiz);
+  }
+
+  private int getHeight(Node<T> node) {
+    if (node == null) {
+      return -1; // A altura de uma árvore vazia é -1
+    }
+
+    int leftHeight = getHeight(node.getEsq());
+    int rightHeight = getHeight(node.getDir());
+
+    return Math.max(leftHeight, rightHeight) + 1;
+  }
+
   // Métodos adicionados para funcionalidade de filtragem e análise
 
   public List<Node<T>> filtrar(Filtro<T> filtro) {

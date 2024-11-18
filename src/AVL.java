@@ -98,6 +98,11 @@ public class AVL<T extends Comparable<T> & Filtravel> extends BST<T> {
         }
     }
 
+    @Override
+    public int getHeight() {
+      return getHeight(raiz);
+    }
+
     private int getHeight(Node<T> node) {
         return node == null ? 0 : node.getAltura();
     }
