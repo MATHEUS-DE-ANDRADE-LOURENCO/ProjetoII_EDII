@@ -1,6 +1,8 @@
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 import Analises.*;
 import Filtragem.Filtro;
@@ -10,6 +12,11 @@ import Modelo.Registro;
 public class Main {
   public static void main(String[] args) {
     AVL<Registro> arvore = new AVL<Registro>();
+
+    String nomeArquivo = "sinistros_fatais.csv";
+    BufferedReader br = new BufferedReader(new FileReader(nomeArquivo));
+
+    String linha = br.readLine();
 
     // Registro 1
     Map<String, String> dadosRegistro1 = new HashMap<>();
