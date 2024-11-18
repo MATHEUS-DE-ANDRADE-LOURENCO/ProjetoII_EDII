@@ -109,7 +109,7 @@ public class Main {
     Map<String, Long> analiseGeografica = arvore.analisar(new FiltroPorAno(2023), new AnaliseGeograficaAnalisador());
 
     // Tipos de veículos
-    Map<String, Long> tiposVeiculos = arvore.analisar(new FiltroPorAno(2023), new TiposVeiculosAnalisador());
+    Map<Integer, Long> tiposVeiculos = arvore.analisar(new FiltroPorAno(2023), new TiposVeiculosAnalisador());
 
     // Gravidade dos sinistros
     Map<String, Long> gravidadeSinistros = arvore.analisar(new FiltroPorAno(2023), new GravidadeSinistrosAnalisador());
@@ -122,6 +122,6 @@ public class Main {
         new AnaliseTemporalComparativaAnalisador());
 
     // Hotspots
-    List<String> hotspots = arvore.analisar(new FiltroPorAno(2023), new HotspotsAnalisador());
+    Map<String, Long> hotspots = arvore.analisar(new FiltroPorAno(2023), new HotspotsAnalisador());
   }
 }
