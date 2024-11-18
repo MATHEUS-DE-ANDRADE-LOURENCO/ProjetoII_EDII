@@ -16,54 +16,53 @@ public class Main {
     String nomeArquivo = "./src/sinistros_fatais.csv";
     long cont = 0;
 
-    long tempoInicioInsercaoAVL = System.currentTimeMillis();
-    long tempoInicioInsercaoBST = System.currentTimeMillis();
+    long tempoTotalInsercaoAVL = 0;
+long tempoTotalInsercaoBST = 0;
 
-    try (BufferedReader br = new BufferedReader(new FileReader(nomeArquivo))) {
-      String linha = br.readLine(); // Pula a primeira linha (cabeçalho)
+try (BufferedReader br = new BufferedReader(new FileReader(nomeArquivo))) {
+  String linha = br.readLine();
 
-      while ((linha = br.readLine()) != null) {
-        String[] registroString = linha.split(";");
-        Map<String, String> mapaRegistro = new HashMap<>();
+  while ((linha = br.readLine()) != null) {
+    String[] registroString = linha.split(";");
+    Map<String, String> mapaRegistro = new HashMap<>();
 
-        // Preencher o mapaRegistro com todos os campos
-        preencherMapaRegistro(mapaRegistro, registroString);
+    preencherMapaRegistro(mapaRegistro, registroString);
 
-        Registro registroTemp = new Registro(mapaRegistro);
+    Registro registroTemp = new Registro(mapaRegistro);
 
-        // Inserir na AVL
-        try {
-          arvoreAVL.insert(registroTemp);
-        } catch (RuntimeException e) {
-          System.err.println("Erro ao inserir registro #" + cont + " na AVL: " + e.getMessage());
-        }
-
-        // Inserir na BST
-        try {
-          arvoreBST.insert(registroTemp);
-        } catch (RuntimeException e) {
-          System.err.println("Erro ao inserir registro #" + cont + " na BST: " + e.getMessage());
-        }
-
-        cont++;
-      }
-
-      long tempoFinalInsercaoAVL = System.currentTimeMillis();
-      long tempoFinalInsercaoBST = System.currentTimeMillis();
-
-      System.out.println("Tempo de inserção AVL: " + (tempoFinalInsercaoAVL - tempoInicioInsercaoAVL) + " ms");
-      System.out.println("Tempo de inserção BST: " + (tempoFinalInsercaoBST - tempoInicioInsercaoBST) + " ms");
-
-      System.out.println("Altura da AVL: " + arvoreAVL.getHeight());
-      System.out.println("Altura da BST: " + arvoreBST.getHeight());
-
-      // Realizar análises em ambas as árvores
-      realizarAnalises(arvoreAVL, "AVL");
-      realizarAnalises(arvoreBST, "BST");
-
-    } catch (IOException e) {
-      System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+    long inicioInsercaoAVL = System.currentTimeMillis();
+    try {
+      arvoreAVL.insert(registroTemp);
+    } catch (RuntimeException e) {
+      System.err.println("Erro ao inserir registro #" + cont + " na AVL: " + e.getMessage());
     }
+    tempoTotalInsercaoAVL += System.currentTimeMillis() - inicioInsercaoAVL;
+
+    long inicioInsercaoBST = System.currentTimeMillis();
+    try {
+      arvoreBST.insert(registroTemp);
+    } catch (RuntimeException e) {
+      System.err.println("Erro ao inserir registro #" + cont + " na BST: " + e.getMessage());
+    }
+      tempoTotalInsercaoBST += System.currentTimeMillis() - inicioInsercaoBST;
+
+      cont++;
+    }
+
+    System.out.println("Tempo total de inserção AVL: " + tempoTotalInsercaoAVL + " ms");
+    System.out.println("Tempo total de inserção BST: " + tempoTotalInsercaoBST + " ms");
+
+    System.out.println("Altura da AVL: " + arvoreAVL.getHeight());
+    System.out.println("Altura da BST: " + arvoreBST.getHeight());
+
+    // Realizar análises em ambas as árvores
+    realizarAnalises(arvoreAVL, "AVL");
+    realizarAnalises(arvoreBST, "BST");
+
+  } catch (IOException e) {
+    System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+  }
+
   }
 
   private static void preencherMapaRegistro(Map<String, String> mapaRegistro, String[] registroString) {
